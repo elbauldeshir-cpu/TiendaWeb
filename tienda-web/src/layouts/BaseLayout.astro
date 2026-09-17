@@ -1,0 +1,66 @@
+---
+import '@/styles/global.css';
+import { brand } from '@/config/site';
+
+interface Props {
+  title: string;
+  description?: string;
+  noindex?: boolean;
+}
+
+const { title, description = brand.description, noindex = false } = Astro.props;
+const fullTitle = title === brand.name ? brand.name : `${title} · ${brand.name}`;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/emblema.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Outfit:wght@300;400;500;600&display=swap"
+    />
+    <meta name="theme-color" content="#E75480" />
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <a
+      href="#contenido"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:rounded-full"
+    >
+      Ir al contenido
+    </a>
+    <slot />
+    <script>
+      // Confirmación accesible antes de acciones destructivas.
+      document.addEventListener('submit', (event) => {
+        const form = event.target as HTMLFormElement;
+        const message = form.dataset.confirm;
+        if (!message) return;
+        if (!window.confirm(message)) {
+          event.preventDefault();
+        }
+      });
+
+      // Imagen de producto no disponible: se reemplaza por el marcador visual.
+      document.addEventListener(
+        'error',
+        (event) => {
+          const target = event.target as HTMLElement;
+          if (target instanceof HTMLImageElement && target.dataset.fallback) {
+            target.src = target.dataset.fallback;
+            delete target.dataset.fallback;
+          }
+        },
+        true,
+      );
+    </script>
+  </body>
+</html>

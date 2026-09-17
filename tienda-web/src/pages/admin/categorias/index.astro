@@ -1,0 +1,162 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import Alert from '@/components/ui/Alert.astro';
+import Badge from '@/components/ui/Badge.astro';
+import Field from '@/components/ui/Field.astro';
+import { listCategoriesWithCount } from '@/services/categories.service';
+import { logError } from '@/lib/errors';
+import type { CategoryWithCount } from '@/types/catalog';
+
+export const prerender = false;
+
+let categories: CategoryWithCount[] = [];
+let loadFailed = false;
+
+try {
+  categories = await listCategoriesWithCount();
+} catch (error) {
+  logError('admin.categories.list', error);
+  loadFailed = true;
+}
+
+const confirmMessage = (category: CategoryWithCount) =>
+  category.productCount > 0
+    ? `¿Eliminar "${category.name}"? Sus ${category.productCount} productos quedarán sin categoría.`
+    : `¿Eliminar "${category.name}"?`;
+---
+
+<AdminLayout title="Categorías">
+  <div class="grid gap-6 lg:grid-cols-[1fr_20rem] lg:items-start">
+    <section>
+      {
+        loadFailed ? (
+          <Alert tone="error" message="No pudimos cargar las categorías. Recarga la página en unos segundos." />
+        ) : categories.length === 0 ? (
+          <div class="surface p-6 text-sm text-muted">
+            Todavía no hay categorías. Crea la primera con el formulario de la derecha y aparecerá
+            de inmediato en la tienda.
+          </div>
+        ) : (
+          <ul class="grid gap-3">
+            {categories.map((category) => (
+              <li class="surface p-4">
+                <div class="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p class="font-medium">{category.name}</p>
+                    <p class="text-sm text-muted">
+                      {category.productCount === 1
+                        ? '1 producto asociado'
+                        : `${category.productCount} productos asociados`}
+                    </p>
+                    {category.description && <p class="text-sm text-muted mt-1">{category.description}</p>}
+                  </div>
+                  <Badge
+                    tone={category.isActive ? 'positive' : 'neutral'}
+                    label={category.isActive ? 'Visible' : 'Oculta'}
+                  />
+                </div>
+
+                <details class="mt-3">
+                  <summary class="cursor-pointer text-sm text-wine">Editar</summary>
+                  <form method="post" action="/api/admin/categories" class="mt-3 space-y-3">
+                    <input type="hidden" name="intent" value="update" />
+                    <input type="hidden" name="id" value={category.id} />
+
+                    <Field id={`name-${category.id}`} label="Nombre" required>
+                      <input
+                        class="field-control"
+                        id={`name-${category.id}`}
+                        name="name"
+                        type="text"
+                        minlength="2"
+                        maxlength="60"
+                        required
+                        value={category.name}
+                      />
+                    </Field>
+
+                    <Field id={`description-${category.id}`} label="Descripción">
+                      <input
+                        class="field-control"
+                        id={`description-${category.id}`}
+                        name="description"
+                        type="text"
+                        maxlength="300"
+                        value={category.description ?? ''}
+                      />
+                    </Field>
+
+                    <label class="flex items-center gap-2 text-sm">
+                      <input type="checkbox" name="isActive" checked={category.isActive} />
+                      Visible en la tienda
+                    </label>
+
+                    <button class="btn btn-primary btn-sm" type="submit">Guardar cambios</button>
+                  </form>
+                </details>
+
+                <div class="flex flex-wrap gap-2 mt-3">
+                  <form method="post" action="/api/admin/categories">
+                    <input type="hidden" name="intent" value="toggle" />
+                    <input type="hidden" name="id" value={category.id} />
+                    <input type="hidden" name="isActive" value={String(!category.isActive)} />
+                    <button class="btn btn-ghost btn-sm" type="submit">
+                      {category.isActive ? 'Ocultar' : 'Mostrar'}
+                    </button>
+                  </form>
+
+                  <form
+                    method="post"
+                    action="/api/admin/categories"
+                    data-confirm={confirmMessage(category)}
+                  >
+                    <input type="hidden" name="intent" value="delete" />
+                    <input type="hidden" name="id" value={category.id} />
+                    <button class="btn btn-danger btn-sm" type="submit">Eliminar</button>
+                  </form>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+    </section>
+
+    <aside class="surface p-5">
+      <h2 class="text-lg">Nueva categoría</h2>
+      <form method="post" action="/api/admin/categories" class="mt-4 space-y-4">
+        <input type="hidden" name="intent" value="create" />
+
+        <Field id="new-name" label="Nombre" required>
+          <input
+            class="field-control"
+            id="new-name"
+            name="name"
+            type="text"
+            minlength="2"
+            maxlength="60"
+            required
+          />
+        </Field>
+
+        <Field id="new-description" label="Descripción" hint="Opcional. Ayuda a ordenar el catálogo.">
+          <input
+            class="field-control"
+            id="new-description"
+            name="description"
+            type="text"
+            maxlength="300"
+            aria-describedby="new-description-hint"
+          />
+        </Field>
+
+        <label class="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="isActive" checked />
+          Visible en la tienda
+        </label>
+
+        <button class="btn btn-primary w-full" type="submit">Crear categoría</button>
+      </form>
+    </aside>
+  </div>
+</AdminLayout>

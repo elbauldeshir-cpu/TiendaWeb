@@ -1,0 +1,55 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import Alert from '@/components/ui/Alert.astro';
+import ProductForm from '@/components/admin/ProductForm.astro';
+import { getProductById } from '@/services/products.service';
+import { listCategories } from '@/services/categories.service';
+import { logError } from '@/lib/errors';
+import { idSchema } from '@/validations/catalog';
+import type { Category, Product, ProductDraft } from '@/types/catalog';
+
+export const prerender = false;
+
+const parsedId = idSchema.safeParse(Astro.params.id ?? '');
+if (!parsedId.success) {
+  return Astro.redirect('/admin/productos?error=not-found', 303);
+}
+
+let product: Product | null = null;
+let categories: Category[] = [];
+let loadFailed = false;
+const draft: ProductDraft | undefined = Astro.url.searchParams.has('draft')
+  ? {
+      name: Astro.url.searchParams.get('name') ?? '',
+      price: Astro.url.searchParams.get('price') ?? '',
+      categoryId: Astro.url.searchParams.get('categoryId') ?? '',
+      description: Astro.url.searchParams.get('description') ?? '',
+      imageUrl: Astro.url.searchParams.get('imageUrl') ?? '',
+      imageAlt: Astro.url.searchParams.get('imageAlt') ?? '',
+      imageUrls: Astro.url.searchParams.get('imageUrls') ?? '',
+      isActive: Astro.url.searchParams.get('isActive') === 'true',
+      inStock: Astro.url.searchParams.get('inStock') === 'true',
+    }
+  : undefined;
+
+try {
+  [product, categories] = await Promise.all([getProductById(parsedId.data), listCategories()]);
+} catch (error) {
+  logError('admin.products.edit', error);
+  loadFailed = true;
+}
+
+if (!loadFailed && !product) {
+  return Astro.redirect('/admin/productos?error=not-found', 303);
+}
+---
+
+<AdminLayout title="Editar producto">
+  {
+    loadFailed || !product ? (
+      <Alert tone="error" message="No pudimos cargar el producto. Recarga la página en unos segundos." />
+    ) : (
+      <ProductForm categories={categories} product={product} draft={draft} />
+    )
+  }
+</AdminLayout>

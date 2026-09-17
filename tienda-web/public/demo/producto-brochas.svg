@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" role="img" aria-label="Brochas">
+  <rect width="600" height="450" fill="#F6D3DC"/>
+  <circle cx="300" cy="200" r="110" fill="#ffffff" opacity="0.55"/>
+  <text x="300" y="210" text-anchor="middle" font-family="Georgia, serif" font-size="34" fill="#6B1D38">Brochas</text>
+  <text x="300" y="250" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#6B1D38" opacity="0.7">imagen de prueba</text>
+</svg>

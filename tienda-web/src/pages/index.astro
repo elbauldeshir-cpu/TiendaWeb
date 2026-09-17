@@ -1,0 +1,126 @@
+---
+import Alert from '@/components/ui/Alert.astro';
+import CategoryFilter from '@/components/storefront/CategoryFilter.astro';
+import EmptyState from '@/components/ui/EmptyState.astro';
+import ProductCard from '@/components/storefront/ProductCard.astro';
+import ProductGridSkeleton from '@/components/ui/ProductGridSkeleton.astro';
+import StorefrontLayout from '@/layouts/StorefrontLayout.astro';
+import { ALL_CATEGORIES, listProducts } from '@/services/products.service';
+import { brand, contact } from '@/config/site';
+import { listCategories } from '@/services/categories.service';
+import { logError } from '@/lib/errors';
+import type { Category, Product } from '@/types/catalog';
+
+export const prerender = false;
+
+const requestedCategory = Astro.url.searchParams.get('categoria')?.trim() || ALL_CATEGORIES;
+
+let products: Product[] = [];
+let categories: Category[] = [];
+let loadFailed = false;
+
+try {
+  [products, categories] = await Promise.all([
+    listProducts({ categorySlug: requestedCategory, onlyActive: true }),
+    listCategories({ onlyActive: true }),
+  ]);
+} catch (error) {
+  logError('index.listProducts', error);
+  loadFailed = true;
+}
+
+const activeCategory =
+  categories.some((category) => category.slug === requestedCategory) || requestedCategory === ALL_CATEGORIES
+    ? requestedCategory
+    : ALL_CATEGORIES;
+
+const activeCategoryName = categories.find((category) => category.slug === activeCategory)?.name;
+const whatsappLink = contact.whatsapp ? `https://wa.me/${contact.whatsapp.replace(/\D/g, '')}` : '/contacto';
+---
+
+<StorefrontLayout title={brand.name} activeCategory={activeCategory}>
+  <section class="bg-blush/50 border-b border-line">
+    <div class="container-page py-12 md:py-16 grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-center">
+      <div>
+        <h1 class="font-display text-4xl md:text-5xl leading-tight">
+          Abre el baúl y escoge tu detalle
+        </h1>
+        <p class="mt-4 text-base text-ink/80 max-w-prose">
+          {brand.description}
+        </p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <a class="btn btn-primary" href="#catalogo">Ver el catálogo</a>
+          <a class="btn btn-secondary" href={whatsappLink}>Hacer un pedido</a>
+        </div>
+      </div>
+      <img
+        src={brand.logo.emblem}
+        alt={brand.logo.emblemAlt}
+        width="100"
+        height="100"
+        class="hidden md:block justify-self-center w-64 h-64"
+      />
+    </div>
+  </section>
+
+  <section id="catalogo" class="container-page py-10">
+    <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
+      <div>
+        <h2 class="text-2xl">{activeCategoryName ?? 'Todo el catálogo'}</h2>
+        <p class="text-sm text-muted mt-1">
+          {products.length === 1 ? '1 producto disponible' : `${products.length} productos disponibles`}
+        </p>
+      </div>
+      <CategoryFilter categories={categories} active={activeCategory} />
+    </div>
+
+    {
+      loadFailed ? (
+        <Alert
+          tone="error"
+          message="No pudimos cargar el catálogo en este momento. Recarga la página en unos segundos."
+        />
+      ) : products.length === 0 && activeCategory !== ALL_CATEGORIES ? (
+        <EmptyState
+          title="Esta categoría todavía no tiene productos"
+          description="Estamos preparando novedades para esta sección. Mientras tanto puedes ver el resto del catálogo."
+          actionLabel="Ver todos los productos"
+          actionHref="/"
+        />
+      ) : products.length === 0 ? (
+        <EmptyState
+          title="El catálogo está en preparación"
+          description="Muy pronto publicaremos los productos disponibles. Escríbenos y te avisamos cuando estén listos."
+          actionLabel="Ir a contacto"
+          actionHref="/contacto"
+        />
+      ) : (
+        <div id="grilla-productos" class="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {products.map((product) => (
+            <ProductCard product={product} />
+          ))}
+        </div>
+      )
+    }
+
+    <div id="estado-cargando" hidden>
+      <ProductGridSkeleton count={6} />
+    </div>
+  </section>
+</StorefrontLayout>
+
+<script>
+  // Al cambiar de categoría la navegación es del servidor: mostramos el
+  // esqueleto de carga mientras llega la nueva respuesta.
+  const grid = document.getElementById('grilla-productos');
+  const loading = document.getElementById('estado-cargando');
+
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement | null;
+    const link = target?.closest('a.chip');
+    if (!link || !loading) return;
+
+    grid?.setAttribute('hidden', '');
+    loading.removeAttribute('hidden');
+  });
+</script>

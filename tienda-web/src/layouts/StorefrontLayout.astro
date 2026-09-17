@@ -1,0 +1,34 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import SiteFooter from '@/components/storefront/SiteFooter.astro';
+import SiteHeader from '@/components/storefront/SiteHeader.astro';
+import { ALL_CATEGORIES } from '@/services/products.service';
+import { listCategories } from '@/services/categories.service';
+import { logError } from '@/lib/errors';
+import type { Category } from '@/types/catalog';
+
+interface Props {
+  title: string;
+  description?: string;
+  activeCategory?: string;
+}
+
+const { title, description, activeCategory = ALL_CATEGORIES } = Astro.props;
+
+// El header necesita las categorías activas; si la consulta falla,
+// la navegación se muestra sin el bloque de categorías en lugar de romperse.
+let categories: Category[] = [];
+try {
+  categories = await listCategories({ onlyActive: true });
+} catch (error) {
+  logError('StorefrontLayout.listCategories', error);
+}
+---
+
+<BaseLayout title={title} description={description}>
+  <SiteHeader categories={categories} activeCategory={activeCategory} />
+  <main id="contenido" class="grow">
+    <slot />
+  </main>
+  <SiteFooter />
+</BaseLayout>

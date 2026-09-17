@@ -1,0 +1,77 @@
+---
+import Alert from '@/components/ui/Alert.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { brand } from '@/config/site';
+import { errorMessage, successMessage } from '@/lib/flash';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+const admin = Astro.locals.admin;
+const currentPath = Astro.url.pathname;
+
+const success = successMessage(Astro.url.searchParams.get('ok'));
+const failure = errorMessage(Astro.url.searchParams.get('error'));
+const failureDetails = Astro.url.searchParams.get('details');
+
+const links = [
+  { label: 'Resumen', href: '/admin' },
+  { label: 'Productos', href: '/admin/productos' },
+  { label: 'Categorías', href: '/admin/categorias' },
+  { label: 'Configuración', href: '/admin/configuracion' },
+];
+
+const isActive = (href: string) => currentPath === href || currentPath.startsWith(`${href}/`);
+---
+
+<BaseLayout title={`${title} · Administración`} noindex>
+  <div class="min-h-screen flex flex-col">
+    <header class="border-b border-line bg-white">
+      <div class="container-page py-3 flex items-center justify-between gap-3">
+        <a href="/admin" class="flex items-center gap-2">
+          <img src={brand.logo.emblem} alt="" width="36" height="36" class="h-9 w-9" aria-hidden="true" />
+          <span class="font-display text-base text-wine">Panel · {brand.name}</span>
+        </a>
+        <div class="flex items-center gap-2">
+          <a class="btn btn-ghost btn-sm" href="/">Ver tienda</a>
+          {
+            admin && (
+              <form method="post" action="/api/auth/logout">
+                <button class="btn btn-secondary btn-sm" type="submit">
+                  Cerrar sesión
+                </button>
+              </form>
+            )
+          }
+        </div>
+      </div>
+      <nav class="border-t border-line" aria-label="Secciones de administración">
+        <ul class="container-page flex gap-1 overflow-x-auto py-2">
+          {
+            links.map((link) => (
+              <li>
+                <a
+                  href={link.href}
+                  class="chip"
+                  aria-current={isActive(link.href) ? 'true' : 'false'}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </header>
+
+    <main id="contenido" class="container-page py-8 grow">
+      <h1 class="text-2xl mb-4">{title}</h1>
+      {success && <Alert tone="success" message={success} class="mb-4" />}
+      {failure && <Alert tone="error" message={failure} class="mb-4" />}
+      {failureDetails && <Alert tone="error" message={`Detalle: ${failureDetails}`} class="mb-4" />}
+      <slot />
+    </main>
+  </div>
+</BaseLayout>

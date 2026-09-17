@@ -1,0 +1,158 @@
+---
+import Field from '@/components/ui/Field.astro';
+import { centsToInputValue } from '@/lib/format';
+import type { Category, Product, ProductDraft } from '@/types/catalog';
+
+interface Props {
+  categories: Category[];
+  product?: Product;
+  draft?: ProductDraft;
+}
+
+const { categories, product, draft } = Astro.props;
+const isEdit = Boolean(product);
+const name = draft?.name ?? product?.name ?? '';
+const price = draft?.price ?? (product ? centsToInputValue(product.priceCents) : '');
+const categoryId = draft?.categoryId ?? (product?.categoryId == null ? '' : String(product.categoryId));
+const description = draft?.description ?? product?.description ?? '';
+const imageUrl = draft?.imageUrl ?? product?.imageUrl ?? '';
+const imageAlt = draft?.imageAlt ?? product?.imageAlt ?? '';
+const imageUrls = draft?.imageUrls ?? '';
+const isActive = draft?.isActive ?? product?.isActive ?? true;
+const inStock = draft?.inStock ?? product?.inStock ?? true;
+---
+
+<form method="post" action="/api/admin/products" enctype="multipart/form-data" class="surface p-6 space-y-5 max-w-2xl" novalidate>
+  <input type="hidden" name="intent" value={isEdit ? 'update' : 'create'} />
+  {isEdit && <input type="hidden" name="id" value={product?.id} />}
+
+  <Field id="name" label="Nombre del producto" required>
+    <input
+      class="field-control"
+      id="name"
+      name="name"
+      type="text"
+      minlength="2"
+      maxlength="120"
+      required
+      value={name}
+    />
+  </Field>
+
+  <Field id="price" label="Precio (COP)" hint="Solo números. Ejemplo: 18000" required>
+    <input
+      class="field-control"
+      id="price"
+      name="price"
+      type="number"
+      min="1"
+      step="1"
+      inputmode="numeric"
+      aria-describedby="price-hint"
+      required
+      value={price}
+    />
+  </Field>
+
+  <Field id="categoryId" label="Categoría">
+    <select class="field-control" id="categoryId" name="categoryId" value={categoryId}>
+      <option value="">Sin categoría</option>
+      {
+        categories.map((category) => (
+          <option value={category.id} selected={categoryId === String(category.id)}>
+            {category.name}
+            {!category.isActive ? ' (oculta)' : ''}
+          </option>
+        ))
+      }
+    </select>
+  </Field>
+
+  <Field id="description" label="Descripción corta" hint="Máximo 600 caracteres.">
+    <textarea
+      class="field-control"
+      id="description"
+      name="description"
+      rows="3"
+      maxlength="600"
+      aria-describedby="description-hint">{description}</textarea>
+  </Field>
+
+  <Field id="imageAlt" label="Texto alternativo de la imagen" hint="Describe la foto para lectores de pantalla.">
+    <input
+      class="field-control"
+      id="imageAlt"
+      name="imageAlt"
+      type="text"
+      maxlength="160"
+      aria-describedby="imageAlt-hint"
+      value={imageAlt}
+    />
+  </Field>
+
+  <Field
+    id="images"
+    label="Cargar imágenes"
+    hint="Puedes seleccionar varias. Se guardarán fuera del proyecto y quedarán asociadas a este producto. Máximo 8 imágenes de 8 MB."
+  >
+    <input
+      class="field-control"
+      id="images"
+      name="images"
+      type="file"
+      accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+      multiple
+      aria-describedby="images-hint"
+    />
+  </Field>
+
+
+  <Field
+    id="imageUrl"
+    label="Imagen principal por URL"
+    hint="Opcional. Pega el enlace de Drive obtenido con Compartir > Cualquier persona con el enlace."
+  >
+    <input
+      class="field-control"
+      id="imageUrl"
+      name="imageUrl"
+      type="text"
+      aria-describedby="imageUrl-hint"
+      value={imageUrl}
+    />
+  </Field>
+
+  <Field
+    id="imageUrls"
+    label="Más imágenes por URL"
+    hint="Una URL por línea. En Drive usa Compartir > Cualquier persona con el enlace."
+  >
+    <textarea
+      class="field-control"
+      id="imageUrls"
+      name="imageUrls"
+      rows="4"
+      maxlength="2000"
+      placeholder="https://drive.google.com/file/d/.../view"
+      aria-describedby="imageUrls-hint">{imageUrls}</textarea>
+  </Field>
+
+  <fieldset class="space-y-3">
+    <legend class="field-label">Disponibilidad</legend>
+    <label class="flex items-center gap-2 text-sm">
+      <input type="checkbox" name="isActive" checked={isActive} />
+      Visible en la tienda
+    </label>
+    <label class="flex items-center gap-2 text-sm">
+      <input type="checkbox" name="inStock" checked={inStock} />
+      Con existencias
+    </label>
+  </fieldset>
+
+  <div class="flex flex-wrap gap-3 pt-2">
+    <button class="btn btn-primary" type="submit">
+      {isEdit ? 'Guardar cambios' : 'Crear producto'}
+    </button>
+    <a class="btn btn-ghost" href="/admin/productos">Cancelar</a>
+  </div>
+</form>

@@ -1,0 +1,74 @@
+---
+import Badge from '@/components/ui/Badge.astro';
+import { formatPrice } from '@/lib/format';
+import { imageDisplayUrl } from '@/lib/image-url';
+import type { Product } from '@/types/catalog';
+
+interface Props {
+  product: Product;
+}
+
+const { product } = Astro.props;
+const placeholder = '/imagen-no-disponible.svg';
+const images = product.images.length > 0
+  ? product.images
+  : [{ id: 0, imageUrl: placeholder, imageAlt: 'Imagen no disponible', sortOrder: 0 }];
+---
+
+<article class="surface overflow-hidden flex flex-col">
+  <div class="product-gallery relative bg-blush/40" data-product-gallery>
+    <div class="product-gallery-track">
+      {images.map((image, index) => (
+        <img
+          src={imageDisplayUrl(image.imageUrl)}
+          alt={image.imageAlt ?? `Fotografía ${index + 1} de ${product.name}`}
+          data-fallback={placeholder}
+          loading={index === 0 ? 'eager' : 'lazy'}
+          width="600"
+          height="450"
+          class={`product-gallery-image h-52 w-full object-cover ${index === 0 ? '' : 'hidden'}`}
+          data-gallery-image
+          data-gallery-index={index}
+        />
+      ))}
+    </div>
+    {images.length > 1 && (
+      <div class="absolute inset-x-3 bottom-3 flex items-center justify-between">
+        <button class="gallery-control" type="button" data-gallery-prev aria-label="Imagen anterior" title="Imagen anterior">‹</button>
+        <span class="gallery-count" data-gallery-count>1 / {images.length}</span>
+        <button class="gallery-control" type="button" data-gallery-next aria-label="Siguiente imagen" title="Siguiente imagen">›</button>
+      </div>
+    )}
+    {
+      !product.inStock && (
+        <span class="absolute top-3 left-3">
+          <Badge tone="warning" label="Agotado" />
+        </span>
+      )
+    }
+  </div>
+
+  <div class="p-4 flex flex-col gap-2 grow">
+    {product.categoryName && <p class="text-xs text-muted">{product.categoryName}</p>}
+    <h3 class="text-base leading-snug">{product.name}</h3>
+    {product.description && <p class="text-sm text-muted line-clamp-3">{product.description}</p>}
+    <p class="mt-auto pt-2 font-display text-xl text-bubblegum">{formatPrice(product.priceCents)}</p>
+  </div>
+</article>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-product-gallery]').forEach((gallery) => {
+    const images = Array.from(gallery.querySelectorAll<HTMLImageElement>('[data-gallery-image]'));
+    const count = gallery.querySelector<HTMLElement>('[data-gallery-count]');
+    let activeIndex = 0;
+
+    const showImage = (index: number) => {
+      activeIndex = (index + images.length) % images.length;
+      images.forEach((image, imageIndex) => image.classList.toggle('hidden', imageIndex !== activeIndex));
+      if (count) count.textContent = `${activeIndex + 1} / ${images.length}`;
+    };
+
+    gallery.querySelector('[data-gallery-prev]')?.addEventListener('click', () => showImage(activeIndex - 1));
+    gallery.querySelector('[data-gallery-next]')?.addEventListener('click', () => showImage(activeIndex + 1));
+  });
+</script>

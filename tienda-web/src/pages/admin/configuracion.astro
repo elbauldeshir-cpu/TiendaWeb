@@ -1,0 +1,90 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import { brand, contact, palette, paymentMethods } from '@/config/site';
+
+export const prerender = false;
+
+const admin = Astro.locals.admin;
+
+const contactRows = [
+  { label: 'Teléfono', value: contact.phone, variable: 'PUBLIC_CONTACT_PHONE' },
+  { label: 'WhatsApp', value: contact.whatsapp, variable: 'PUBLIC_CONTACT_WHATSAPP' },
+  { label: 'Correo', value: contact.email, variable: 'PUBLIC_CONTACT_EMAIL' },
+  { label: 'Instagram', value: contact.instagram, variable: 'PUBLIC_CONTACT_INSTAGRAM' },
+  { label: 'Dirección', value: contact.address, variable: 'PUBLIC_CONTACT_ADDRESS' },
+  { label: 'Ciudad', value: contact.city, variable: 'PUBLIC_CONTACT_CITY' },
+];
+
+const colors = Object.entries(palette);
+---
+
+<AdminLayout title="Configuración">
+  <p class="text-sm text-muted max-w-prose">
+    Estos valores se leen de la configuración del proyecto. Hoy se editan en las variables de
+    entorno; la estructura ya está lista para moverlos a una tabla administrable sin cambiar las
+    vistas públicas.
+  </p>
+
+  <section class="surface p-5 mt-6">
+    <h2 class="text-lg">Sesión</h2>
+    <p class="mt-2 text-sm text-muted">Estás administrando como {admin?.email ?? 'administrador'}.</p>
+  </section>
+
+  <section class="surface p-5 mt-4">
+    <h2 class="text-lg">Datos de contacto</h2>
+    <ul class="mt-4 space-y-2">
+      {
+        contactRows.map((row) => (
+          <li class="flex flex-wrap items-baseline justify-between gap-2 border-b border-line pb-2 text-sm">
+            <span>{row.label}</span>
+            <span class={row.value ? '' : 'text-muted'}>
+              {row.value || 'Sin configurar'}
+            </span>
+            <code class="text-xs text-muted w-full sm:w-auto">{row.variable}</code>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="surface p-5 mt-4">
+    <h2 class="text-lg">Formas de pago</h2>
+    <ul class="mt-4 space-y-2 text-sm">
+      {
+        paymentMethods.map((method) => (
+          <li class="flex items-center justify-between gap-3 border-b border-line pb-2">
+            <span>{method.name}</span>
+            <span class="text-muted">{method.enabled ? 'Activa' : 'Inactiva'}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="mt-3 text-sm text-muted">
+      Los datos concretos de cada medio de pago (cuentas, titulares) se cargan en
+      <code class="mx-1">src/config/site.ts</code>
+      o, mejor, en variables de entorno. Nunca en el repositorio público.
+    </p>
+  </section>
+
+  <section class="surface p-5 mt-4">
+    <h2 class="text-lg">Identidad visual</h2>
+    <div class="mt-4 flex items-center gap-4">
+      <img src={brand.logo.emblem} alt={brand.logo.emblemAlt} width="64" height="64" class="h-16 w-16" />
+      <div>
+        <p class="font-display text-lg text-wine">{brand.name}</p>
+        <p class="text-sm text-muted">{brand.tagline}</p>
+      </div>
+    </div>
+    <ul class="mt-4 flex flex-wrap gap-3">
+      {
+        colors.map(([name, hex]) => (
+          <li class="flex items-center gap-2 text-sm">
+            <span class="h-6 w-6 rounded-full border border-line" style={`background:${hex}`} aria-hidden="true" />
+            <span>{name}</span>
+            <code class="text-xs text-muted">{hex}</code>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</AdminLayout>

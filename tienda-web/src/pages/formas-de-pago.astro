@@ -1,0 +1,43 @@
+---
+import StorefrontLayout from '@/layouts/StorefrontLayout.astro';
+import { brand, contact, paymentMethods } from '@/config/site';
+
+export const prerender = false;
+
+const methods = paymentMethods.filter((method) => method.enabled);
+const whatsappLink = contact.whatsapp ? `https://wa.me/${contact.whatsapp.replace(/\D/g, '')}` : '/contacto';
+---
+
+<StorefrontLayout title="Formas de pago" description={`Medios de pago aceptados en ${brand.name}.`}>
+  <section class="container-page py-12">
+    <h1 class="text-3xl">Cómo pagar tu pedido</h1>
+    <p class="mt-3 text-muted max-w-prose">
+      Confirmamos tu compra por WhatsApp y te compartimos los datos del medio de pago que elijas.
+    </p>
+
+    <ul class="mt-8 grid gap-4 sm:grid-cols-2">
+      {
+        methods.map((method) => (
+          <li class="surface p-5">
+            <h2 class="text-lg">{method.name}</h2>
+            <p class="mt-2 text-sm text-muted">{method.summary}</p>
+            {method.details ? (
+              <p class="mt-3 text-sm">{method.details}</p>
+            ) : (
+              <p class="mt-3 text-sm text-muted">
+                Te enviamos los datos al confirmar el pedido.
+              </p>
+            )}
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="surface p-5 mt-6">
+      <p class="text-sm">
+        Envíanos el comprobante para despachar tu pedido.
+        <a class="underline hover:text-bubblegum ml-1" href={whatsappLink}>Escríbenos</a>
+      </p>
+    </div>
+  </section>
+</StorefrontLayout>

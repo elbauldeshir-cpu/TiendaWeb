@@ -1,0 +1,20 @@
+---
+interface Props {
+  id: string;
+  label: string;
+  hint?: string;
+  required?: boolean;
+}
+
+const { id, label, hint, required = false } = Astro.props;
+---
+
+<div>
+  <label class="field-label" for={id}>
+    {label}
+    {required && <span aria-hidden="true"> *</span>}
+    {required && <span class="sr-only"> (obligatorio)</span>}
+  </label>
+  <slot />
+  {hint && <p class="field-hint" id={`${id}-hint`}>{hint}</p>}
+</div>

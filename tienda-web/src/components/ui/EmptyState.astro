@@ -1,0 +1,22 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  actionLabel?: string;
+  actionHref?: string;
+}
+
+const { title, description, actionLabel, actionHref } = Astro.props;
+---
+
+<div class="surface px-6 py-12 text-center">
+  <p class="font-display text-xl text-wine">{title}</p>
+  <p class="mt-2 text-sm text-muted max-w-prose mx-auto">{description}</p>
+  {
+    actionLabel && actionHref && (
+      <a class="btn btn-secondary mt-5" href={actionHref}>
+        {actionLabel}
+      </a>
+    )
+  }
+</div>

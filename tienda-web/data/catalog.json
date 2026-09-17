@@ -1,0 +1,138 @@
+{
+  "categories": [
+    {
+      "id": 1,
+      "name": "Maquillaje",
+      "slug": "maquillaje",
+      "description": "Labiales, rubores y bases.",
+      "isActive": true,
+      "createdAt": "2026-09-17T00:18:57.000Z",
+      "updatedAt": "2026-09-17T00:18:57.000Z"
+    },
+    {
+      "id": 2,
+      "name": "Cuidado de la piel",
+      "slug": "cuidado-de-la-piel",
+      "description": "Limpieza, hidratación y protección.",
+      "isActive": true,
+      "createdAt": "2026-09-17T00:18:57.000Z",
+      "updatedAt": "2026-09-17T00:18:57.000Z"
+    },
+    {
+      "id": 3,
+      "name": "Billeteras",
+      "slug": "billeteras",
+      "description": "Billeteras",
+      "isActive": true,
+      "createdAt": "2026-09-17T00:18:57.000Z",
+      "updatedAt": "2026-09-17T20:49:37.481Z"
+    },
+    {
+      "id": 4,
+      "name": "Regalos",
+      "slug": "regalos",
+      "description": "Cajas y kits para ocasiones especiales.",
+      "isActive": true,
+      "createdAt": "2026-09-17T00:18:57.000Z",
+      "updatedAt": "2026-09-17T00:18:57.000Z"
+    },
+    {
+      "id": 5,
+      "name": "Bolsos",
+      "slug": "bolsos",
+      "description": "Bolsos",
+      "isActive": true,
+      "createdAt": "2026-09-17T20:50:17.005Z",
+      "updatedAt": "2026-09-17T20:50:17.005Z"
+    },
+    {
+      "id": 6,
+      "name": "Lamparas",
+      "slug": "lamparas",
+      "description": "Lamparas",
+      "isActive": true,
+      "createdAt": "2026-09-17T20:50:23.056Z",
+      "updatedAt": "2026-09-17T20:50:23.056Z"
+    },
+    {
+      "id": 7,
+      "name": "Llaveros",
+      "slug": "llaveros",
+      "description": null,
+      "isActive": true,
+      "createdAt": "2026-09-17T20:50:36.289Z",
+      "updatedAt": "2026-09-17T20:50:36.289Z"
+    },
+    {
+      "id": 8,
+      "name": "Mugs",
+      "slug": "mugs",
+      "description": null,
+      "isActive": true,
+      "createdAt": "2026-09-17T20:50:44.015Z",
+      "updatedAt": "2026-09-17T20:50:44.015Z"
+    },
+    {
+      "id": 9,
+      "name": "Pantuflas",
+      "slug": "pantuflas",
+      "description": null,
+      "isActive": true,
+      "createdAt": "2026-09-17T20:50:48.305Z",
+      "updatedAt": "2026-09-17T20:50:48.305Z"
+    },
+    {
+      "id": 10,
+      "name": "Pijamas",
+      "slug": "pijamas",
+      "description": null,
+      "isActive": true,
+      "createdAt": "2026-09-17T20:50:53.270Z",
+      "updatedAt": "2026-09-17T20:50:53.270Z"
+    },
+    {
+      "id": 11,
+      "name": "Sombrillas",
+      "slug": "sombrillas",
+      "description": null,
+      "isActive": true,
+      "createdAt": "2026-09-17T20:50:57.379Z",
+      "updatedAt": "2026-09-17T20:50:57.379Z"
+    },
+    {
+      "id": 12,
+      "name": "Termos",
+      "slug": "termos",
+      "description": null,
+      "isActive": true,
+      "createdAt": "2026-09-17T20:51:00.993Z",
+      "updatedAt": "2026-09-17T20:51:00.993Z"
+    },
+    {
+      "id": 13,
+      "name": "Toallas",
+      "slug": "toallas",
+      "description": null,
+      "isActive": true,
+      "createdAt": "2026-09-17T20:51:13.097Z",
+      "updatedAt": "2026-09-17T20:51:13.097Z"
+    }
+  ],
+  "products": [
+    {
+      "id": 5,
+      "name": "[DEMO] Set de brochas x5",
+      "slug": "demo-set-de-brochas-x5",
+      "description": "Cinco brochas con estuche. Dato de prueba.",
+      "priceCents": 4500000,
+      "imageUrl": "/demo/producto-brochas.svg",
+      "imageAlt": "Juego de brochas de maquillaje",
+      "categoryId": 3,
+      "isActive": true,
+      "inStock": true,
+      "createdAt": "2026-09-17T00:18:57.000Z",
+      "updatedAt": "2026-09-17T00:18:57.000Z"
+    }
+  ],
+  "images": []
+}

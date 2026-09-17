@@ -1,0 +1,71 @@
+---
+import Alert from '@/components/ui/Alert.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Field from '@/components/ui/Field.astro';
+import { brand } from '@/config/site';
+import { errorMessage, successMessage } from '@/lib/flash';
+
+export const prerender = false;
+
+// Si ya hay sesión válida, no tiene sentido mostrar el formulario.
+if (Astro.locals.admin) {
+  return Astro.redirect('/admin', 302);
+}
+
+const failure = errorMessage(Astro.url.searchParams.get('error'));
+const success = successMessage(Astro.url.searchParams.get('ok'));
+const next = Astro.url.searchParams.get('next') ?? '/admin';
+---
+
+<BaseLayout title="Ingresar" noindex>
+  <main id="contenido" class="min-h-screen grid place-items-center px-5 py-12">
+    <div class="w-full max-w-sm">
+      <div class="text-center">
+        <img
+          src={brand.logo.src}
+          alt={brand.logo.alt}
+          width={brand.logo.width}
+          height={brand.logo.height}
+          class="mx-auto h-20 w-auto"
+        />
+        <h1 class="mt-4 text-2xl">Administración</h1>
+        <p class="mt-1 text-sm text-muted">Ingresa para gestionar el catálogo.</p>
+      </div>
+
+      {success && <Alert tone="success" message={success} class="mt-5" />}
+      {failure && <Alert tone="error" message={failure} class="mt-5" />}
+
+      <form method="post" action="/api/auth/login" class="surface p-6 mt-5 space-y-4">
+        <input type="hidden" name="next" value={next} />
+
+        <Field id="email" label="Correo" required>
+          <input
+            class="field-control"
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="username"
+            required
+          />
+        </Field>
+
+        <Field id="password" label="Contraseña" required>
+          <input
+            class="field-control"
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+        </Field>
+
+        <button class="btn btn-primary w-full" type="submit">Ingresar</button>
+      </form>
+
+      <p class="mt-4 text-center text-sm">
+        <a class="text-muted hover:text-bubblegum" href="/">Volver a la tienda</a>
+      </p>
+    </div>
+  </main>
+</BaseLayout>

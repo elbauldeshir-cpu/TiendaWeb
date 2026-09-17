@@ -1,0 +1,32 @@
+---
+import { ALL_CATEGORIES } from '@/services/products.service';
+import type { Category } from '@/types/catalog';
+
+interface Props {
+  categories: Category[];
+  active: string;
+}
+
+const { categories, active } = Astro.props;
+---
+
+<nav aria-label="Filtrar por categoría" class="hidden md:block">
+  <ul class="flex flex-wrap gap-2">
+    <li>
+      <a class="chip" href="/" aria-current={active === ALL_CATEGORIES ? 'true' : 'false'}>Todos</a>
+    </li>
+    {
+      categories.map((category) => (
+        <li>
+          <a
+            class="chip"
+            href={`/?categoria=${category.slug}`}
+            aria-current={active === category.slug ? 'true' : 'false'}
+          >
+            {category.name}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

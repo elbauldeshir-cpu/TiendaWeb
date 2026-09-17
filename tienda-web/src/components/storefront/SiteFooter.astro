@@ -1,0 +1,73 @@
+---
+import { brand, contact, navigation } from '@/config/site';
+
+const year = new Date().getFullYear();
+const hasWhatsapp = contact.whatsapp.length > 0;
+const hasEmail = contact.email.length > 0;
+---
+
+<footer class="mt-16 border-t border-line bg-white">
+  <div class="container-page py-10 grid gap-8 md:grid-cols-3">
+    <div>
+      <img
+        src={brand.logo.src}
+        alt={brand.logo.alt}
+        width={brand.logo.width}
+        height={brand.logo.height}
+        class="h-16 w-auto"
+      />
+      <p class="mt-3 text-sm text-muted max-w-xs">{brand.description}</p>
+    </div>
+
+    <nav aria-label="Enlaces del pie de página">
+      <p class="font-display text-base text-wine">Navegación</p>
+      <ul class="mt-3 space-y-2 text-sm">
+        {
+          navigation.map((item) => (
+            <li>
+              <a class="hover:text-bubblegum" href={item.href}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div>
+      <p class="font-display text-base text-wine">Escríbenos</p>
+      <ul class="mt-3 space-y-2 text-sm">
+        {
+          hasWhatsapp && (
+            <li>
+              <a class="hover:text-bubblegum" href={`https://wa.me/${contact.whatsapp.replace(/\D/g, '')}`}>
+                WhatsApp {contact.whatsapp}
+              </a>
+            </li>
+          )
+        }
+        {
+          hasEmail && (
+            <li>
+              <a class="hover:text-bubblegum" href={`mailto:${contact.email}`}>
+                {contact.email}
+              </a>
+            </li>
+          )
+        }
+        {
+          !hasWhatsapp && !hasEmail && (
+            <li class="text-muted">Los datos de contacto se configuran desde las variables de entorno.</li>
+          )
+        }
+      </ul>
+    </div>
+  </div>
+
+  <div class="border-t border-line">
+    <div class="container-page py-4 flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
+      <p>© {year} {brand.name}</p>
+      <a class="hover:text-bubblegum" href="/admin">Administración</a>
+    </div>
+  </div>
+</footer>

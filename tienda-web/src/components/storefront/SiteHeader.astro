@@ -1,0 +1,95 @@
+---
+import { brand, navigation } from '@/config/site';
+import type { Category } from '@/types/catalog';
+
+interface Props {
+  categories: Category[];
+  activeCategory: string;
+}
+
+const { categories, activeCategory } = Astro.props;
+const currentPath = Astro.url.pathname;
+---
+
+<header class="border-b border-line bg-cream/95 backdrop-blur sticky top-0 z-40">
+  <div class="container-page flex items-center justify-between gap-4 py-3">
+    <a href="/" class="flex items-center gap-3 shrink-0" aria-label={`${brand.name}, ir al inicio`}>
+      <img
+        src={brand.logo.src}
+        alt={brand.logo.alt}
+        width={brand.logo.width}
+        height={brand.logo.height}
+        class="h-14 w-auto sm:h-16"
+      />
+      <span class="hidden lg:block text-xs text-muted border-l border-line pl-3">{brand.tagline}</span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-1" aria-label="Navegación principal">
+      {
+        navigation.map((item) => (
+          <a
+            href={item.href}
+            class="px-3 py-2 text-sm rounded-full hover:bg-blush"
+            aria-current={currentPath === item.href ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <button
+      type="button"
+      class="btn btn-secondary btn-sm md:hidden"
+      aria-expanded="false"
+      aria-controls="menu-movil"
+      data-menu-toggle
+    >
+      Menú
+    </button>
+  </div>
+
+  <div id="menu-movil" class="md:hidden hidden border-t border-line bg-white" data-menu-panel>
+    <nav class="container-page py-4 flex flex-col gap-1" aria-label="Navegación móvil">
+      {
+        navigation.map((item) => (
+          <a
+            href={item.href}
+            class="px-3 py-2 rounded-xl hover:bg-blush"
+            aria-current={currentPath === item.href ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+    <div class="container-page pb-4">
+      <p class="text-xs text-muted mb-2">Categorías</p>
+      <div class="flex flex-wrap gap-2">
+        <a class="chip" href="/" aria-current={activeCategory === 'todos' ? 'true' : 'false'}>Todos</a>
+        {
+          categories.map((category) => (
+            <a
+              class="chip"
+              href={`/?categoria=${category.slug}`}
+              aria-current={activeCategory === category.slug ? 'true' : 'false'}
+            >
+              {category.name}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const panel = document.querySelector<HTMLElement>('[data-menu-panel]');
+
+  toggle?.addEventListener('click', () => {
+    const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!isOpen));
+    panel?.classList.toggle('hidden', isOpen);
+  });
+</script>

@@ -1,0 +1,46 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import Alert from '@/components/ui/Alert.astro';
+import ProductForm from '@/components/admin/ProductForm.astro';
+import { listCategories } from '@/services/categories.service';
+import { logError } from '@/lib/errors';
+import type { Category, ProductDraft } from '@/types/catalog';
+
+export const prerender = false;
+
+let categories: Category[] = [];
+let loadFailed = false;
+const draft: ProductDraft | undefined = Astro.url.searchParams.has('draft')
+  ? {
+      name: Astro.url.searchParams.get('name') ?? '',
+      price: Astro.url.searchParams.get('price') ?? '',
+      categoryId: Astro.url.searchParams.get('categoryId') ?? '',
+      description: Astro.url.searchParams.get('description') ?? '',
+      imageUrl: Astro.url.searchParams.get('imageUrl') ?? '',
+      imageAlt: Astro.url.searchParams.get('imageAlt') ?? '',
+      imageUrls: Astro.url.searchParams.get('imageUrls') ?? '',
+      isActive: Astro.url.searchParams.get('isActive') === 'true',
+      inStock: Astro.url.searchParams.get('inStock') === 'true',
+    }
+  : undefined;
+
+try {
+  categories = await listCategories();
+} catch (error) {
+  logError('admin.products.new', error);
+  loadFailed = true;
+}
+---
+
+<AdminLayout title="Crear producto">
+  {
+    loadFailed ? (
+      <Alert
+        tone="error"
+        message="No pudimos cargar las categorías. Recarga la página antes de crear el producto."
+      />
+    ) : (
+      <ProductForm categories={categories} draft={draft} />
+    )
+  }
+</AdminLayout>

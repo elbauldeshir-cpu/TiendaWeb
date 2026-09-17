@@ -1,0 +1,17 @@
+[build]
+  command = "npm run build:remote"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Las variables ADMIN_EMAIL, ADMIN_PASSWORD_HASH, AUTH_SECRET,
+# ASTRO_DB_REMOTE_URL y ASTRO_DB_APP_TOKEN se configuran en
+# Netlify > Site configuration > Environment variables.
+# Nunca deben vivir en este archivo.
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-store"

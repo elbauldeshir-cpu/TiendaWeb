@@ -1,0 +1,81 @@
+---
+import AdminLayout from '@/layouts/AdminLayout.astro';
+import Alert from '@/components/ui/Alert.astro';
+import { countProducts } from '@/services/products.service';
+import { listCategoriesWithCount } from '@/services/categories.service';
+import { logError } from '@/lib/errors';
+import type { CategoryWithCount } from '@/types/catalog';
+
+export const prerender = false;
+
+let stats = { total: 0, active: 0, outOfStock: 0 };
+let categories: CategoryWithCount[] = [];
+let loadFailed = false;
+
+try {
+  [stats, categories] = await Promise.all([countProducts(), listCategoriesWithCount()]);
+} catch (error) {
+  logError('admin.dashboard', error);
+  loadFailed = true;
+}
+
+const uncategorized = stats.total - categories.reduce((sum, category) => sum + category.productCount, 0);
+
+const cards = [
+  { label: 'Productos en total', value: stats.total },
+  { label: 'Visibles en la tienda', value: stats.active },
+  { label: 'Marcados como agotados', value: stats.outOfStock },
+  { label: 'Categorías', value: categories.length },
+];
+---
+
+<AdminLayout title="Resumen">
+  {
+    loadFailed ? (
+      <Alert tone="error" message="No pudimos leer los datos de la tienda. Recarga la página en unos segundos." />
+    ) : (
+      <>
+        <div class="grid gap-4 grid-cols-2 lg:grid-cols-4">
+          {cards.map((card) => (
+            <div class="surface p-5">
+              <p class="font-display text-3xl text-bubblegum">{card.value}</p>
+              <p class="mt-1 text-sm text-muted">{card.label}</p>
+            </div>
+          ))}
+        </div>
+
+        <div class="surface p-5 mt-6">
+          <h2 class="text-lg">Productos por categoría</h2>
+          {categories.length === 0 ? (
+            <p class="mt-3 text-sm text-muted">
+              Todavía no hay categorías. Crea la primera para organizar el catálogo.
+            </p>
+          ) : (
+            <ul class="mt-4 space-y-2">
+              {categories.map((category) => (
+                <li class="flex items-center justify-between gap-3 text-sm border-b border-line pb-2">
+                  <span>
+                    {category.name}
+                    {!category.isActive && <span class="text-muted"> · oculta</span>}
+                  </span>
+                  <span class="text-muted">{category.productCount}</span>
+                </li>
+              ))}
+              {uncategorized > 0 && (
+                <li class="flex items-center justify-between gap-3 text-sm">
+                  <span class="text-muted">Sin categoría</span>
+                  <span class="text-muted">{uncategorized}</span>
+                </li>
+              )}
+            </ul>
+          )}
+        </div>
+
+        <div class="flex flex-wrap gap-3 mt-6">
+          <a class="btn btn-primary" href="/admin/productos/nuevo">Crear producto</a>
+          <a class="btn btn-secondary" href="/admin/categorias">Gestionar categorías</a>
+        </div>
+      </>
+    )
+  }
+</AdminLayout>

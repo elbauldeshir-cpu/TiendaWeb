@@ -1,0 +1,16 @@
+---
+interface Props {
+  tone?: 'neutral' | 'positive' | 'warning';
+  label: string;
+}
+
+const { tone = 'neutral', label } = Astro.props;
+
+const tones = {
+  neutral: 'bg-blush text-wine',
+  positive: 'bg-white border border-rose text-wine',
+  warning: 'bg-wine text-white',
+} as const;
+---
+
+<span class={`badge ${tones[tone]}`}>{label}</span>
