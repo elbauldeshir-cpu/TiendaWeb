@@ -25,7 +25,7 @@ const isActive = draft?.isActive ?? product?.isActive ?? true;
 const inStock = draft?.inStock ?? product?.inStock ?? true;
 ---
 
-<form method="post" action="/api/admin/products" enctype="multipart/form-data" class="surface p-6 space-y-5 max-w-2xl" novalidate>
+<form method="post" action="/api/admin/products" class="surface p-6 space-y-5 max-w-2xl" novalidate>
   <input type="hidden" name="intent" value={isEdit ? 'update' : 'create'} />
   {isEdit && <input type="hidden" name="id" value={product?.id} />}
 
@@ -90,22 +90,6 @@ const inStock = draft?.inStock ?? product?.inStock ?? true;
       maxlength="160"
       aria-describedby="imageAlt-hint"
       value={imageAlt}
-    />
-  </Field>
-
-  <Field
-    id="images"
-    label="Cargar imágenes"
-    hint="Puedes seleccionar varias. Se asociarán a este producto. Máximo 8 imágenes de 8 MB."
-  >
-    <input
-      class="field-control"
-      id="images"
-      name="images"
-      type="file"
-      accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
-      multiple
-      aria-describedby="images-hint"
     />
   </Field>
 

@@ -30,10 +30,6 @@ function readProductInput(form: FormData) {
   });
 }
 
-function readImageFiles(form: FormData): File[] {
-  return form.getAll('images').filter((value): value is File => value instanceof File);
-}
-
 function invalidProductRedirect(path: string, form: FormData, details: Record<string, string>): string {
   const url = new URL(withFlash(path, { error: 'invalid-product' }), 'http://local');
   url.searchParams.set('draft', '1');
@@ -89,7 +85,6 @@ export const POST: APIRoute = async ({ request, redirect }) => {
         const product = await createProduct(toInput(parsed.data));
         await saveProductImages(
           product.id,
-          readImageFiles(form),
           parsed.data.imageAlt,
           parsed.data.imageUrls,
           parsed.data.imageUrl,
@@ -113,7 +108,6 @@ export const POST: APIRoute = async ({ request, redirect }) => {
         const product = await updateProduct(id.data, toInput(parsed.data));
         await saveProductImages(
           product.id,
-          readImageFiles(form),
           parsed.data.imageAlt,
           parsed.data.imageUrls,
           parsed.data.imageUrl,
@@ -145,7 +139,6 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   } catch (error) {
     logError(`admin.products.${intent}`, {
       error,
-      hasUploadedImages: readImageFiles(form).length > 0,
       hasPrimaryImageUrl: Boolean(form.get('imageUrl')?.toString().trim()),
       additionalImageUrlCount: (form.get('imageUrls')?.toString() ?? '')
         .split(/\r?\n/)

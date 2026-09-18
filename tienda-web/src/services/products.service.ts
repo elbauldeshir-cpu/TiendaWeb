@@ -1,6 +1,3 @@
-import { randomUUID } from 'node:crypto';
-import { mkdir, unlink, writeFile } from 'node:fs/promises';
-import path from 'node:path';
 import { Category, Product, ProductImage, db, eq } from 'astro:db';
 
 import { AppError } from '@/lib/errors';
@@ -179,22 +176,12 @@ export async function updateProduct(id: number, input: ProductInput): Promise<Pr
   return toModel(row, await categoryIndex());
 }
 
-const IMAGE_EXTENSIONS: Record<string, string> = {
-  'image/avif': '.avif',
-  'image/gif': '.gif',
-  'image/jpeg': '.jpg',
-  'image/png': '.png',
-  'image/webp': '.webp',
-};
-
 export async function saveProductImages(
   productId: number,
-  files: File[],
   imageAlt: string | null,
   rawImageUrls = '',
   primaryImageUrl: string | null = null,
 ): Promise<void> {
-  const validFiles = files.filter((file) => file.size > 0);
   const rawUrls = rawImageUrls
     .split(/[\r\n,;]+/)
     .map((value) => value.trim())
@@ -203,50 +190,22 @@ export async function saveProductImages(
   if (imageUrls.some((value) => !value)) {
     throw new AppError('Cada enlace de imagen debe ser una URL pública válida.', { status: 422 });
   }
-  if (validFiles.some((file) => !IMAGE_EXTENSIONS[file.type] || file.size > 8 * 1024 * 1024)) {
-    throw new AppError('Cada imagen debe ser JPG, PNG, WEBP o GIF y pesar máximo 8 MB.', { status: 422 });
-  }
-
-  const mediaDirectory = process.env.MEDIA_DIRECTORY
-    ? path.resolve(process.env.MEDIA_DIRECTORY)
-    : path.resolve(process.cwd(), '..', 'tienda-web-media');
-  const directory = path.join(mediaDirectory, String(productId));
   const existingImages = await db.select().from(ProductImage).where(eq(ProductImage.productId, productId));
   const normalizedPrimaryUrl = primaryImageUrl ? normalizeImageUrl(primaryImageUrl) : null;
   const existingUrls = new Set(existingImages.map((image) => image.imageUrl));
   const urlsToSave = [...new Set(imageUrls)].filter(
     (imageUrl): imageUrl is string => Boolean(imageUrl) && imageUrl !== normalizedPrimaryUrl && !existingUrls.has(imageUrl),
   );
-  if (validFiles.length + urlsToSave.length === 0) return;
-  if (validFiles.length + urlsToSave.length > 8) {
-    throw new AppError('Puedes cargar máximo 8 imágenes por vez.', { status: 422 });
-  }
-  if (validFiles.length > 0) {
-    await mkdir(directory, { recursive: true });
-  }
+  if (urlsToSave.length === 0) return;
+  if (urlsToSave.length > 8) throw new AppError('Puedes guardar máximo 8 imágenes por vez.', { status: 422 });
   const startingOrder = existingImages.reduce((max, image) => Math.max(max, image.sortOrder), -1) + 1;
 
-  if (urlsToSave.length > 0) {
-    await db.insert(ProductImage).values(
-      urlsToSave.map((imageUrl, index) => ({
-        productId,
-        imageUrl,
-        imageAlt,
-        sortOrder: startingOrder + index,
-      })),
-    );
-  }
-
-  const fileStartingOrder = startingOrder + urlsToSave.length;
-  for (const [index, file] of validFiles.entries()) {
-    const fileName = `producto-${productId}-${randomUUID()}${IMAGE_EXTENSIONS[file.type]}`;
-    const imageUrl = `/api/media/local/${productId}/${fileName}`;
-    await writeFile(path.join(directory, fileName), new Uint8Array(await file.arrayBuffer()));
+  for (const [index, imageUrl] of urlsToSave.entries()) {
     await db.insert(ProductImage).values({
       productId,
       imageUrl,
       imageAlt,
-      sortOrder: fileStartingOrder + index,
+      sortOrder: startingOrder + index,
     });
   }
   await persistCatalog();
@@ -275,21 +234,6 @@ export async function deleteProduct(id: number): Promise<void> {
   const existing = await getProductById(id);
   if (!existing) throw new AppError('No encontramos el producto.', { status: 404 });
 
-  const images = await db.select().from(ProductImage).where(eq(ProductImage.productId, id));
-  for (const image of images) {
-    if (image.imageUrl.startsWith('/productos/')) {
-      await unlink(path.join(process.cwd(), 'public', image.imageUrl.slice(1))).catch(() => undefined);
-    } else if (image.imageUrl.startsWith('/api/media/local/')) {
-      const mediaDirectory = process.env.MEDIA_DIRECTORY
-        ? path.resolve(process.env.MEDIA_DIRECTORY)
-        : path.resolve(process.cwd(), '..', 'tienda-web-media');
-      const relativePath = image.imageUrl.slice('/api/media/local/'.length);
-      const filePath = path.resolve(mediaDirectory, relativePath);
-      if (filePath.startsWith(`${mediaDirectory}${path.sep}`)) {
-        await unlink(filePath).catch(() => undefined);
-      }
-    }
-  }
   await db.delete(ProductImage).where(eq(ProductImage.productId, id));
   await db.delete(Product).where(eq(Product.id, id));
   await persistCatalog();
