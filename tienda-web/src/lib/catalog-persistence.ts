@@ -20,7 +20,7 @@ function restoreDates(row: Record<string, unknown>, fields: string[]): Record<st
 }
 
 export async function persistCatalog(): Promise<void> {
-  if (!process.env.ASTRO_DATABASE_FILE) return;
+  if (process.env.ASTRO_DB_REMOTE_URL || !process.env.ASTRO_DATABASE_FILE) return;
 
   const [categories, products, images] = await Promise.all([
     db.select().from(Category),
