@@ -195,11 +195,11 @@ export async function saveProductImages(
   primaryImageUrl: string | null = null,
 ): Promise<void> {
   const validFiles = files.filter((file) => file.size > 0);
-  const imageUrls = rawImageUrls
-    .split(/\r?\n/)
+  const rawUrls = rawImageUrls
+    .split(/[\r\n,;]+/)
     .map((value) => value.trim())
-    .filter(Boolean)
-    .map(normalizeImageUrl);
+    .filter(Boolean);
+  const imageUrls = rawUrls.map(normalizeImageUrl);
   if (imageUrls.some((value) => !value)) {
     throw new AppError('Cada enlace de imagen debe ser una URL pública válida.', { status: 422 });
   }
@@ -224,13 +224,15 @@ export async function saveProductImages(
   }
   const startingOrder = existingImages.reduce((max, image) => Math.max(max, image.sortOrder), -1) + 1;
 
-  for (const [index, imageUrl] of urlsToSave.entries()) {
-    await db.insert(ProductImage).values({
-      productId,
-      imageUrl,
-      imageAlt,
-      sortOrder: startingOrder + index,
-    });
+  if (urlsToSave.length > 0) {
+    await db.insert(ProductImage).values(
+      urlsToSave.map((imageUrl, index) => ({
+        productId,
+        imageUrl,
+        imageAlt,
+        sortOrder: startingOrder + index,
+      })),
+    );
   }
 
   const fileStartingOrder = startingOrder + urlsToSave.length;
