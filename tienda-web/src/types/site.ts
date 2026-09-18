@@ -10,6 +10,7 @@ export interface ContactInfo {
 
 export interface PaymentMethod {
   id: string;
+  icon: string;
   name: string;
   /** Explicación corta para el comprador. */
   summary: string;

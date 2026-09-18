@@ -33,17 +33,23 @@ const location = [contact.address, contact.city].filter(Boolean).join(', ');
 ---
 
 <StorefrontLayout title="Contacto" description={`Cómo comunicarte con ${brand.name}.`}>
-  <section class="container-page py-12">
-    <h1 class="text-3xl">Hablemos</h1>
-    <p class="mt-3 text-muted max-w-prose">
-      Escríbenos por el canal que prefieras. Respondemos pedidos, disponibilidad y envíos.
-    </p>
+  <section class="contact-hero">
+    <div class="container-page py-12 md:py-16">
+      <p class="text-xs font-semibold uppercase tracking-[0.18em] text-blush">Estamos para ayudarte</p>
+      <h1 class="mt-3 text-4xl md:text-5xl">Hablemos</h1>
+      <p class="mt-4 max-w-xl text-white/80">
+        Escríbenos por el canal que prefieras. Respondemos pedidos, disponibilidad y envíos.
+      </p>
+    </div>
+  </section>
 
-    <div class="mt-8 grid gap-4 sm:grid-cols-2">
+  <section class="container-page py-10 md:py-14">
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {
         channels.map((channel) => (
-          <a class="surface p-5 block hover:border-rose" href={channel.href}>
-            <p class="text-xs text-muted">{channel.label}</p>
+          <a class="surface contact-card block p-5" href={channel.href}>
+            <span class="payment-icon" aria-hidden="true">{channel.label === 'WhatsApp' ? '✦' : channel.label === 'Correo' ? '@' : channel.label === 'Instagram' ? '◎' : '↗'}</span>
+            <p class="mt-4 text-xs text-muted">{channel.label}</p>
             <p class="mt-1 font-display text-lg text-wine">{channel.value}</p>
           </a>
         ))
@@ -51,7 +57,7 @@ const location = [contact.address, contact.city].filter(Boolean).join(', ');
 
       {
         channels.length === 0 && (
-          <p class="surface p-5 text-sm text-muted sm:col-span-2">
+          <p class="surface p-5 text-sm text-muted sm:col-span-2 lg:col-span-4">
             Los canales de contacto aún no están configurados. Cárgalos en las variables de entorno
             <code class="mx-1">PUBLIC_CONTACT_*</code>
             y aparecerán aquí automáticamente.
@@ -62,9 +68,12 @@ const location = [contact.address, contact.city].filter(Boolean).join(', ');
 
     {
       location && (
-        <div class="surface p-5 mt-4">
-          <p class="text-xs text-muted">Dirección</p>
-          <address class="mt-1 not-italic">{location}</address>
+        <div class="mt-6 flex items-center gap-4 rounded-2xl border border-line bg-blush/35 p-5">
+          <span class="payment-icon shrink-0" aria-hidden="true">⌖</span>
+          <div>
+            <p class="text-xs text-muted">Punto de encuentro</p>
+            <address class="mt-1 not-italic text-wine">{location}</address>
+          </div>
         </div>
       )
     }

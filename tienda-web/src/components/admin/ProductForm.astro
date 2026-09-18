@@ -1,6 +1,7 @@
 ---
 import Field from '@/components/ui/Field.astro';
 import { centsToInputValue } from '@/lib/format';
+import { imageDisplayUrl } from '@/lib/image-url';
 import type { Category, Product, ProductDraft } from '@/types/catalog';
 
 interface Props {
@@ -17,7 +18,9 @@ const categoryId = draft?.categoryId ?? (product?.categoryId == null ? '' : Stri
 const description = draft?.description ?? product?.description ?? '';
 const imageUrl = draft?.imageUrl ?? product?.imageUrl ?? '';
 const imageAlt = draft?.imageAlt ?? product?.imageAlt ?? '';
-const imageUrls = draft?.imageUrls ?? '';
+const existingImages = product?.images ?? [];
+const relatedImages = product?.images.filter((image) => image.imageUrl !== imageUrl) ?? [];
+const imageUrls = draft?.imageUrls ?? relatedImages.map((image) => image.imageUrl).join('\n');
 const isActive = draft?.isActive ?? product?.isActive ?? true;
 const inStock = draft?.inStock ?? product?.inStock ?? true;
 ---
@@ -93,7 +96,7 @@ const inStock = draft?.inStock ?? product?.inStock ?? true;
   <Field
     id="images"
     label="Cargar imágenes"
-    hint="Puedes seleccionar varias. Se guardarán fuera del proyecto y quedarán asociadas a este producto. Máximo 8 imágenes de 8 MB."
+    hint="Puedes seleccionar varias. Se asociarán a este producto. Máximo 8 imágenes de 8 MB."
   >
     <input
       class="field-control"
@@ -106,6 +109,26 @@ const inStock = draft?.inStock ?? product?.inStock ?? true;
     />
   </Field>
 
+  {isEdit && existingImages.length > 0 && (
+    <fieldset class="space-y-3 rounded-2xl border border-line bg-cream/70 p-4">
+      <legend class="field-label px-1">Imágenes asociadas</legend>
+      <div class="grid grid-cols-3 gap-3 sm:grid-cols-5">
+        {existingImages.map((image, index) => (
+          <figure class="overflow-hidden rounded-xl border border-line bg-white">
+            <img
+              src={imageDisplayUrl(image.imageUrl)}
+              alt={image.imageAlt ?? `${name}, imagen ${index + 1}`}
+              width="160"
+              height="120"
+              class="aspect-[4/3] w-full object-cover"
+              loading="lazy"
+            />
+            <figcaption class="truncate px-2 py-1 text-[0.68rem] text-muted">{index === 0 ? 'Principal' : `Imagen ${index + 1}`}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </fieldset>
+  )}
 
   <Field
     id="imageUrl"
@@ -125,7 +148,7 @@ const inStock = draft?.inStock ?? product?.inStock ?? true;
   <Field
     id="imageUrls"
     label="Más imágenes por URL"
-    hint="Una URL por línea. En Drive usa Compartir > Cualquier persona con el enlace."
+    hint="Una URL por línea. Las imágenes actuales ya aparecen aquí para que puedas conservarlas."
   >
     <textarea
       class="field-control"

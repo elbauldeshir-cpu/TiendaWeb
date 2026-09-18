@@ -39,10 +39,11 @@ const whatsappLink = contact.whatsapp ? `https://wa.me/${contact.whatsapp.replac
 ---
 
 <StorefrontLayout title={brand.name} activeCategory={activeCategory}>
-  <section class="bg-blush/50 border-b border-line">
-    <div class="container-page py-12 md:py-16 grid gap-8 md:grid-cols-[1.2fr_1fr] md:items-center">
+  <section class="hero-band border-b border-line">
+    <div class="container-page py-10 md:py-14 grid gap-8 md:grid-cols-[1.15fr_0.85fr] md:items-center">
       <div>
-        <h1 class="font-display text-4xl md:text-5xl leading-tight">
+        <p class="text-xs font-semibold uppercase tracking-[0.18em] text-wine/70">{brand.tagline}</p>
+        <h1 class="mt-3 font-display text-4xl md:text-6xl leading-[1.05]">
           Abre el baúl y escoge tu detalle
         </h1>
         <p class="mt-4 text-base text-ink/80 max-w-prose">
@@ -53,13 +54,9 @@ const whatsappLink = contact.whatsapp ? `https://wa.me/${contact.whatsapp.replac
           <a class="btn btn-secondary" href={whatsappLink}>Hacer un pedido</a>
         </div>
       </div>
-      <img
-        src={brand.logo.emblem}
-        alt={brand.logo.emblemAlt}
-        width="100"
-        height="100"
-        class="hidden md:block justify-self-center w-64 h-64"
-      />
+      <div class="hero-art hidden md:grid" aria-hidden="true">
+        <img src={brand.logo.emblem} alt={brand.logo.emblemAlt} width="260" height="260" />
+      </div>
     </div>
   </section>
 
