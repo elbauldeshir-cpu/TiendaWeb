@@ -211,7 +211,6 @@ export async function saveProductImages(
     ? path.resolve(process.env.MEDIA_DIRECTORY)
     : path.resolve(process.cwd(), '..', 'tienda-web-media');
   const directory = path.join(mediaDirectory, String(productId));
-  await mkdir(directory, { recursive: true });
   const existingImages = await db.select().from(ProductImage).where(eq(ProductImage.productId, productId));
   const normalizedPrimaryUrl = primaryImageUrl ? normalizeImageUrl(primaryImageUrl) : null;
   const existingUrls = new Set(existingImages.map((image) => image.imageUrl));
@@ -221,6 +220,9 @@ export async function saveProductImages(
   if (validFiles.length + urlsToSave.length === 0) return;
   if (validFiles.length + urlsToSave.length > 8) {
     throw new AppError('Puedes cargar máximo 8 imágenes por vez.', { status: 422 });
+  }
+  if (validFiles.length > 0) {
+    await mkdir(directory, { recursive: true });
   }
   const startingOrder = existingImages.reduce((max, image) => Math.max(max, image.sortOrder), -1) + 1;
 
