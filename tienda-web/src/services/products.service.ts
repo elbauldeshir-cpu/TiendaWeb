@@ -190,6 +190,9 @@ export async function saveProductImages(
   if (imageUrls.some((value) => !value)) {
     throw new AppError('Cada enlace de imagen debe ser una URL pública válida.', { status: 422 });
   }
+  if (rawUrls.length > 8) throw new AppError('Puedes guardar máximo 8 imágenes por vez.', { status: 422 });
+
+  const allImages = await db.select().from(ProductImage);
   const existingImages = await db.select().from(ProductImage).where(eq(ProductImage.productId, productId));
   const normalizedPrimaryUrl = primaryImageUrl ? normalizeImageUrl(primaryImageUrl) : null;
   const existingUrls = new Set(existingImages.map((image) => image.imageUrl));
@@ -197,16 +200,24 @@ export async function saveProductImages(
     (imageUrl): imageUrl is string => Boolean(imageUrl) && imageUrl !== normalizedPrimaryUrl && !existingUrls.has(imageUrl),
   );
   if (urlsToSave.length === 0) return;
-  if (urlsToSave.length > 8) throw new AppError('Puedes guardar máximo 8 imágenes por vez.', { status: 422 });
+  const nextImageId = allImages.reduce((max, image) => Math.max(max, image.id), 0) + 1;
   const startingOrder = existingImages.reduce((max, image) => Math.max(max, image.sortOrder), -1) + 1;
 
   for (const [index, imageUrl] of urlsToSave.entries()) {
-    await db.insert(ProductImage).values({
-      productId,
-      imageUrl,
-      imageAlt,
-      sortOrder: startingOrder + index,
-    });
+    try {
+      await db.insert(ProductImage).values({
+        id: nextImageId + index,
+        productId,
+        imageUrl,
+        imageAlt,
+        sortOrder: startingOrder + index,
+      });
+    } catch (error) {
+      throw new AppError('No fue posible guardar las imágenes del producto.', {
+        status: 500,
+        cause: error,
+      });
+    }
   }
   await persistCatalog();
 }
