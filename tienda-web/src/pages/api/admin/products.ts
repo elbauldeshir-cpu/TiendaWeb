@@ -69,6 +69,12 @@ function errorCodeFor(error: unknown): ErrorCode {
 export const POST: APIRoute = async ({ request, redirect }) => {
   const form = await request.formData();
   const intent = form.get('intent')?.toString() ?? '';
+  console.info('[api.admin.products.request]', JSON.stringify({
+    intent,
+    fields: Array.from(form.keys()),
+    imageUrlsLength: form.get('imageUrls')?.toString().length ?? 0,
+    imageUrlsCount: (form.get('imageUrls')?.toString() ?? '').split(/[\r\n,;]+/).filter((value) => value.trim()).length,
+  }));
 
   try {
     switch (intent) {

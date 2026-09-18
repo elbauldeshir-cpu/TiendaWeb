@@ -34,5 +34,13 @@ export function toUserMessage(error: unknown): string {
 
 /** Registro centralizado: el detalle técnico queda solo en los logs. */
 export function logError(context: string, error: unknown): void {
-  console.error(`[${context}]`, error);
+  const value = error instanceof Error
+    ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+        cause: error.cause,
+      }
+    : error;
+  console.error(`[${context}]`, JSON.stringify(value));
 }

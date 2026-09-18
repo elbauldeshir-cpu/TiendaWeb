@@ -187,6 +187,12 @@ export async function saveProductImages(
     .map((value) => value.trim())
     .filter(Boolean);
   const imageUrls = rawUrls.map(normalizeImageUrl);
+  console.info('[products.images.received]', JSON.stringify({
+    productId,
+    rawUrlCount: rawUrls.length,
+    normalizedUrlCount: imageUrls.filter(Boolean).length,
+    primaryProvided: Boolean(primaryImageUrl),
+  }));
   if (imageUrls.some((value) => !value)) {
     throw new AppError('Cada enlace de imagen debe ser una URL pública válida.', { status: 422 });
   }
@@ -199,6 +205,12 @@ export async function saveProductImages(
   const urlsToSave = [...new Set(imageUrls)].filter(
     (imageUrl): imageUrl is string => Boolean(imageUrl) && imageUrl !== normalizedPrimaryUrl && !existingUrls.has(imageUrl),
   );
+  console.info('[products.images.plan]', JSON.stringify({
+    productId,
+    existingImageCount: existingImages.length,
+    totalImageCount: allImages.length,
+    urlsToSaveCount: urlsToSave.length,
+  }));
   if (urlsToSave.length === 0) return;
   const nextImageId = allImages.reduce((max, image) => Math.max(max, image.id), 0) + 1;
   const startingOrder = existingImages.reduce((max, image) => Math.max(max, image.sortOrder), -1) + 1;
@@ -212,7 +224,20 @@ export async function saveProductImages(
         imageAlt,
         sortOrder: startingOrder + index,
       });
+      console.info('[products.images.inserted]', JSON.stringify({
+        productId,
+        imageId: nextImageId + index,
+        sortOrder: startingOrder + index,
+      }));
     } catch (error) {
+      console.error('[products.images.insert-failed]', JSON.stringify({
+        productId,
+        imageId: nextImageId + index,
+        imageUrlHost: (() => {
+          try { return new URL(imageUrl).hostname; } catch { return 'invalid'; }
+        })(),
+        error: error instanceof Error ? { name: error.name, message: error.message, cause: error.cause } : error,
+      }));
       throw new AppError('No fue posible guardar las imágenes del producto.', {
         status: 500,
         cause: error,
