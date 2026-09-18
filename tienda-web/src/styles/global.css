@@ -1,5 +1,5 @@
 @import 'tailwindcss';
-@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,500;6..96,600;6..96,700&family=Manrope:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap');
 
 /* Tokens de marca. Reflejan la paleta definida en src/config/site.ts */
 @theme {
@@ -13,8 +13,8 @@
   --color-muted: #7a6a63;
   --color-line: #efd7dd;
 
-  --font-display: 'Bodoni Moda', 'Iowan Old Style', Georgia, serif;
-  --font-sans: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
 
   --radius-card: 18px;
 }
@@ -35,8 +35,9 @@
   h2,
   h3 {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: 0;
+    line-height: 1.15;
     color: var(--color-wine);
   }
 
@@ -224,26 +225,20 @@
   }
 
   .hero-band {
-    background:
-      radial-gradient(circle at 82% 22%, rgb(255 255 255 / 80%) 0 5rem, transparent 5.1rem),
-      linear-gradient(115deg, #f8dfe2 0%, #f4c2c2 54%, #efd7dd 100%);
+    background: linear-gradient(115deg, #f8dfe2 0%, #f4c2c2 54%, #efd7dd 100%);
   }
 
   .hero-art {
     display: grid;
     place-items: center;
-    min-height: 14rem;
-    border: 1px solid rgb(107 29 56 / 14%);
-    border-radius: 2rem;
-    background: rgb(255 255 255 / 42%);
-    box-shadow: 0 1.5rem 3rem rgb(107 29 56 / 12%);
+    min-height: 18rem;
   }
 
   .hero-art img {
-    width: min(12rem, 58%);
+    width: min(18rem, 78%);
     height: auto;
     object-fit: contain;
-    filter: drop-shadow(0 1rem 0.9rem rgb(107 29 56 / 16%));
+    filter: drop-shadow(0 1.1rem 1rem rgb(107 29 56 / 18%));
   }
 
   .contact-hero {
@@ -274,8 +269,17 @@
     border-radius: 1rem;
     background: var(--color-blush);
     color: var(--color-wine);
-    font-size: 1.35rem;
-    line-height: 1;
+    color: var(--color-wine);
+  }
+
+  .payment-icon svg {
+    width: 1.45rem;
+    height: 1.45rem;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 
   .product-gallery-track,

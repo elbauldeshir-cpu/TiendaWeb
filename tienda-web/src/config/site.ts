@@ -68,7 +68,7 @@ export const contact: ContactInfo = {
 export const paymentMethods: PaymentMethod[] = [
   {
     id: 'transferencia',
-    icon: '🏦',
+    icon: 'bank',
     name: 'Transferencia bancaria',
     summary: 'Envíanos el comprobante por WhatsApp y despachamos tu pedido.',
     details: '',
@@ -76,7 +76,7 @@ export const paymentMethods: PaymentMethod[] = [
   },
   {
     id: 'nequi',
-    icon: '◉',
+    icon: 'wallet',
     name: 'Nequi',
     summary: 'Pago desde la app a nuestro número registrado.',
     details: '',
@@ -84,7 +84,7 @@ export const paymentMethods: PaymentMethod[] = [
   },
   {
     id: 'bancolombia',
-    icon: '▦',
+    icon: 'building',
     name: 'Bancolombia',
     summary: 'Transferencia o consignación a cuenta de ahorros.',
     details: '',
@@ -92,7 +92,7 @@ export const paymentMethods: PaymentMethod[] = [
   },
   {
     id: 'daviplata',
-    icon: '◆',
+    icon: 'smartphone',
     name: 'Daviplata',
     summary: 'Pago desde la app a nuestro número registrado.',
     details: '',
@@ -100,7 +100,7 @@ export const paymentMethods: PaymentMethod[] = [
   },
   {
     id: 'efectivo',
-    icon: '◌',
+    icon: 'cash',
     name: 'Efectivo',
     summary: 'Disponible en entregas presenciales acordadas previamente.',
     details: '',

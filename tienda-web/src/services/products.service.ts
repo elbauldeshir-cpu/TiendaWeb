@@ -203,11 +203,6 @@ export async function saveProductImages(
   if (imageUrls.some((value) => !value)) {
     throw new AppError('Cada enlace de imagen debe ser una URL pública válida.', { status: 422 });
   }
-  const urlsToSave = imageUrls.filter((value) => value !== primaryImageUrl);
-  if (validFiles.length + urlsToSave.length === 0) return;
-  if (validFiles.length + urlsToSave.length > 8) {
-    throw new AppError('Puedes cargar máximo 8 imágenes por vez.', { status: 422 });
-  }
   if (validFiles.some((file) => !IMAGE_EXTENSIONS[file.type] || file.size > 8 * 1024 * 1024)) {
     throw new AppError('Cada imagen debe ser JPG, PNG, WEBP o GIF y pesar máximo 8 MB.', { status: 422 });
   }
@@ -218,6 +213,15 @@ export async function saveProductImages(
   const directory = path.join(mediaDirectory, String(productId));
   await mkdir(directory, { recursive: true });
   const existingImages = await db.select().from(ProductImage).where(eq(ProductImage.productId, productId));
+  const normalizedPrimaryUrl = primaryImageUrl ? normalizeImageUrl(primaryImageUrl) : null;
+  const existingUrls = new Set(existingImages.map((image) => image.imageUrl));
+  const urlsToSave = [...new Set(imageUrls)].filter(
+    (imageUrl): imageUrl is string => Boolean(imageUrl) && imageUrl !== normalizedPrimaryUrl && !existingUrls.has(imageUrl),
+  );
+  if (validFiles.length + urlsToSave.length === 0) return;
+  if (validFiles.length + urlsToSave.length > 8) {
+    throw new AppError('Puedes cargar máximo 8 imágenes por vez.', { status: 422 });
+  }
   const startingOrder = existingImages.reduce((max, image) => Math.max(max, image.sortOrder), -1) + 1;
 
   for (const [index, imageUrl] of urlsToSave.entries()) {
