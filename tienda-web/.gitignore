@@ -2,8 +2,8 @@ node_modules/
 dist/
 .astro/
 data/*.db
-auth
-auth-wal
+/auth
+/auth-wal
 public/productos/*
 !public/productos/.gitkeep
 .netlify/
