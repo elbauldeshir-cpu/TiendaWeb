@@ -37,12 +37,13 @@ export const brand = {
  * Este objeto existe para usos programáticos (temas, correos, exportaciones).
  */
 export const palette = {
-  bubblegum: '#E75480',
-  blush: '#F4C2C2',
-  rose: '#D87093',
-  wine: '#6B1D38',
-  ink: '#2B1B17',
-  cream: '#FFF5F5',
+  bubblegum: '#FF2E79',
+  blush: '#FFE7F0',
+  rose: '#E86B9A',
+  wine: '#6B0F3D',
+  gold: '#E8A93B',
+  ink: '#321525',
+  cream: '#FFF8FB',
 } as const;
 
 /**
@@ -68,7 +69,7 @@ export const contact: ContactInfo = {
 export const paymentMethods: PaymentMethod[] = [
   {
     id: 'transferencia',
-    icon: 'bank',
+    icon: '/LlaveBancolombia.png',
     name: 'Llave Bancolombia',
     summary: 'Envía el pago usando la llave Bancolombia y comparte el comprobante por WhatsApp.',
     details: 'Llave: 43259477 · Shirley Johanna Gil · CC 43.259.477',
@@ -76,7 +77,7 @@ export const paymentMethods: PaymentMethod[] = [
   },
   {
     id: 'nequi',
-    icon: 'wallet',
+    icon: '/logonequi.jpg',
     name: 'Nequi',
     summary: 'Pago desde la app a nuestro número registrado.',
     details: 'Número: 3127936446 · Shirley Gil · CC 43.259.477',
@@ -84,7 +85,7 @@ export const paymentMethods: PaymentMethod[] = [
   },
   {
     id: 'bancolombia',
-    icon: 'building',
+    icon: '/LogoBancolombia.png',
     name: 'Cuenta de ahorros Bancolombia',
     summary: 'Transferencia o consignación a cuenta de ahorros.',
     details: 'Cuenta: 34738014776 · Shirley Johanna Gil Hoyos · CC 43.259.477',

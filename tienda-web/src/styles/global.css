@@ -2,15 +2,16 @@
 
 /* Tokens de marca. Reflejan la paleta definida en src/config/site.ts */
 @theme {
-  --color-bubblegum: #e75480;
-  --color-blush: #f4c2c2;
-  --color-rose: #d87093;
-  --color-wine: #6b1d38;
-  --color-ink: #2b1b17;
-  --color-cream: #fff5f5;
+  --color-bubblegum: #ff2e79;
+  --color-blush: #ffe7f0;
+  --color-rose: #e86b9a;
+  --color-wine: #6b0f3d;
+  --color-gold: #e8a93b;
+  --color-ink: #321525;
+  --color-cream: #fff8fb;
   --color-surface: #ffffff;
   --color-muted: #7a6a63;
-  --color-line: #efd7dd;
+  --color-line: #f2bfd2;
 
   --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
   --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
@@ -224,7 +225,7 @@
   }
 
   .hero-band {
-    background: linear-gradient(115deg, #f8dfe2 0%, #f4c2c2 54%, #efd7dd 100%);
+    background: linear-gradient(115deg, #fff8fb 0%, #ffe7f0 54%, #f2bfd2 100%);
   }
 
   .hero-art {
@@ -244,7 +245,7 @@
   }
 
   .contact-hero {
-    background: linear-gradient(135deg, #6b1d38, #8d3155);
+    background: linear-gradient(135deg, #6b0f3d, #a51d62);
     color: #fff;
   }
 
@@ -282,6 +283,13 @@
     fill: none;
     stroke-linecap: round;
     stroke-linejoin: round;
+  }
+
+  .payment-icon img {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.65rem;
+    object-fit: contain;
   }
 
   .product-gallery-track,
