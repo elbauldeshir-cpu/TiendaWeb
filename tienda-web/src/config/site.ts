@@ -62,16 +62,16 @@ export const contact: ContactInfo = {
 };
 
 /**
- * Formas de pago. `details` queda vacío a propósito: los números de cuenta
- * y teléfonos reales se cargan por configuración, nunca en el repositorio.
+ * Formas de pago visibles en la tienda. Estos datos se muestran al comprador
+ * para que pueda elegir el medio y enviar el comprobante.
  */
 export const paymentMethods: PaymentMethod[] = [
   {
     id: 'transferencia',
     icon: 'bank',
-    name: 'Transferencia bancaria',
-    summary: 'Envíanos el comprobante por WhatsApp y despachamos tu pedido.',
-    details: '',
+    name: 'Llave Bancolombia',
+    summary: 'Envía el pago usando la llave Bancolombia y comparte el comprobante por WhatsApp.',
+    details: 'Llave: 43259477 · Shirley Johanna Gil · CC 43.259.477',
     enabled: true,
   },
   {
@@ -79,23 +79,15 @@ export const paymentMethods: PaymentMethod[] = [
     icon: 'wallet',
     name: 'Nequi',
     summary: 'Pago desde la app a nuestro número registrado.',
-    details: '',
+    details: 'Número: 3127936446 · Shirley Gil · CC 43.259.477',
     enabled: true,
   },
   {
     id: 'bancolombia',
     icon: 'building',
-    name: 'Bancolombia',
+    name: 'Cuenta de ahorros Bancolombia',
     summary: 'Transferencia o consignación a cuenta de ahorros.',
-    details: '',
-    enabled: true,
-  },
-  {
-    id: 'daviplata',
-    icon: 'smartphone',
-    name: 'Daviplata',
-    summary: 'Pago desde la app a nuestro número registrado.',
-    details: '',
+    details: 'Cuenta: 34738014776 · Shirley Johanna Gil Hoyos · CC 43.259.477',
     enabled: true,
   },
   {
